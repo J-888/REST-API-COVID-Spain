@@ -1,1 +1,1 @@
-# REST-API-COVID-Espa-a
+# REST API COVID Spain
