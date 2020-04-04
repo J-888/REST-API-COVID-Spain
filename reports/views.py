@@ -27,7 +27,7 @@ def report_list(request):
 	if request.method == 'GET':
 		reports = Report.objects.all()
 
-		regionParam = request.GET['ca'] # TODO NO PARAM SUPPORT
+		regionParam = request.GET.get('ca') # TODO NO PARAM SUPPORT
 		if regionParam is not None:
 			reports = reports.filter(ca=regionParam)
 
