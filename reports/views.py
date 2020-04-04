@@ -7,12 +7,17 @@ from rest_framework.parsers import JSONParser
 from reports.models import Report
 from reports.serializers import ReportSerializer
 
+from django.views.generic.list import ListView
+
 class JSONResponse(HttpResponse):
 	# An HttpResponse that renders its content into JSON.
 	def __init__(self, data, **kwargs):
 		content = JSONRenderer().render(data)
 		kwargs['content_type'] = 'application/json'
 		super(JSONResponse, self).__init__(content, **kwargs)
+
+"""class ReportsListView(ListView):
+	model = Report"""
 
 # API Services
 @csrf_exempt # TODO only POST requires csrf token
@@ -21,6 +26,11 @@ def report_list(request):
 
 	if request.method == 'GET':
 		reports = Report.objects.all()
+
+		regionParam = request.GET['ca'] # TODO NO PARAM SUPPORT
+		if regionParam is not None:
+			reports = reports.filter(ca=regionParam)
+
 		serializer = ReportSerializer(reports, many=True)
 		return JSONResponse(serializer.data)
 
