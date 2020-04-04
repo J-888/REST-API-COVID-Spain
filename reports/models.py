@@ -6,11 +6,11 @@ class Report(models.Model):
 	
 	ca = models.CharField(max_length=50)
 	date = models.DateField()
-	cases = models.IntegerField(default=None)
-	deceases = models.IntegerField(default=None)
-	cured = models.IntegerField(default=None)
+	cases = models.IntegerField(blank=True, null=True)
+	deceases = models.IntegerField(blank=True, null=True)
+	cured = models.IntegerField(blank=True, null=True)
 
-	hospitalized = models.IntegerField(default=None)
-	uci = models.IntegerField(default=None)
-	accIncidence = models.IntegerField(default=None)
-	diffCases = models.IntegerField(default=None)
+	hospitalized = models.IntegerField(blank=True, null=True)
+	uci = models.IntegerField(blank=True, null=True)
+	accIncidence = models.IntegerField(blank=True, null=True)
+	diffCases = models.IntegerField(blank=True, null=True)
