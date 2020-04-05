@@ -25,7 +25,7 @@ SECRET_KEY = 'wpu@gn5u!bbf#r3wb_ut3xdyde1vm39znmenc_73te*r))5cz6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
