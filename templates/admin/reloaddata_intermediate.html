@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <form action="/admin/reloaddata/" method="post">
+    {% csrf_token %}
+    <p>
+        Are you sure you want to reload the API data?
+    </p>
+
+    <label for="csv_url">.csv url: </label>
+    <input id="csv_url" type="url" name="csv_url" value="{{ csv_url }}">
+    <input type="hidden" name="action" value="update_status" />
+    <input type="submit" name="apply" value="Update status" />
+</form>
+{% endblock %}
