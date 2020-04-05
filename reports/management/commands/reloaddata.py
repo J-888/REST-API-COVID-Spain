@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from reports.models import Report
 
 from urllib.request import urlopen
+from urllib.error import URLError
 import csv
 import codecs
 from datetime import datetime
@@ -9,18 +10,20 @@ from datetime import datetime
 class Command(BaseCommand):
 	help = 'Reloads the whole dataset'
 
-	"""def add_arguments(self, parser):
-		parser.add_argument('url', nargs=1, type=int)"""
+	def add_arguments(self, parser):
+		parser.add_argument('url', nargs=1, type=str)
 
 
 	def handle(self, *args, **options):
-		
-		print("Parsings url...")
-		
-		Report.objects.all().delete()
 
-		url = ""
-		rawtext = urlopen(url).read()
+		url = options['url'][0]
+
+		try:
+			rawtext = urlopen(url).read()
+		except URLError:
+			print("Invalid url")
+			return
+		
 		lines = rawtext.splitlines()
 		stats = csv.reader(codecs.iterdecode(lines, 'utf-8'))
 
@@ -41,40 +44,54 @@ class Command(BaseCommand):
 				firstRow = False
 				headings = [x.upper() for x in row]
 
-				regionIndex = headings.index("CCAA")
-				dateIndex = headings.index("FECHA")
-				casesIndex = headings.index("CASOS")
-				accIncidenceIndex = headings.index("IA")
-				uciIndex = headings.index("UCI")
-				deceasesIndex = headings.index("MUERTES")
-				hospitalizedIndex = headings.index("HOSPITALIZADOS")
-				curedIndex = headings.index("CURADOS")
-				diffCasesIndex = headings.index("NUEVOS")
+				try:
+					regionIndex = headings.index("CCAA")
+					dateIndex = headings.index("FECHA")
+					casesIndex = headings.index("CASOS")
+					accIncidenceIndex = headings.index("IA")
+					uciIndex = headings.index("UCI")
+					deceasesIndex = headings.index("MUERTES")
+					hospitalizedIndex = headings.index("HOSPITALIZADOS")
+					curedIndex = headings.index("CURADOS")
+					diffCasesIndex = headings.index("NUEVOS")
+				except ValueError:
+					print("Invalid csv headers")
+					return
+		
+				Report.objects.all().delete()	# Now its safe to drop table
 			else:
 				region = row[regionIndex]
-				date = datetime.strptime(row[dateIndex], '%Y-%m-%d').date()
-				cases = strToInt(row[casesIndex])
-				deceases = strToInt(row[deceasesIndex])
-				cured = strToInt(row[curedIndex])
+				validDate = True
 
-				hospitalized = strToInt(row[hospitalizedIndex])
-				uci = strToInt(row[uciIndex])
-				accIncidence = strToFloat(row[accIncidenceIndex])
-				diffCases = strToInt(row[diffCasesIndex])
-
+				try:
+					date = datetime.strptime(row[dateIndex], '%Y-%m-%d').date()
+				except ValueError:
+					validDate = False
+					print("Skipped row: Invalid date for region",  region, ":", row[dateIndex])
 				
-				Report(
-					ca = region,
-					date = date,
-					cases = cases,
-					deceases = deceases,
-					cured = cured,
+				if validDate:
+					cases = strToInt(row[casesIndex])
+					deceases = strToInt(row[deceasesIndex])
+					cured = strToInt(row[curedIndex])
 
-					hospitalized = hospitalized,
-					uci = uci,
-					accIncidence = accIncidence,
-					diffCases = diffCases,
-				).save()
+					hospitalized = strToInt(row[hospitalizedIndex])
+					uci = strToInt(row[uciIndex])
+					accIncidence = strToFloat(row[accIncidenceIndex])
+					diffCases = strToInt(row[diffCasesIndex])
+
+					
+					Report(
+						ca = region,
+						date = date,
+						cases = cases,
+						deceases = deceases,
+						cured = cured,
+
+						hospitalized = hospitalized,
+						uci = uci,
+						accIncidence = accIncidence,
+						diffCases = diffCases,
+					).save()
 		
 		print("DONE")
 
