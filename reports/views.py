@@ -8,6 +8,7 @@ from reports.models import Report
 from reports.serializers import ReportSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from datetime import datetime
 
 class JSONResponse(HttpResponse):
 	# An HttpResponse that renders its content into JSON.
@@ -23,13 +24,27 @@ class ReportsApiView(APIView):
 	def get(self, request):
 		reports = Report.objects.all()
 
+		# region filtering
 		regionParam = request.GET.get('ca')
 		if regionParam is not None:
-			reports = reports.filter(ca=regionParam)
+			# reports = reports.filter(ca=regionParam)
+			reports = reports.filter(ca__iexact=regionParam.strip()) 
 
+		# date filtering
 		dateParam = request.GET.get('date')
-		if dateParam is not None:
+		if dateParam is not None:	# exact date filtering
 			reports = reports.filter(date=dateParam)
+		else:	# range date filtering
+			startdate = request.GET.get('startdate')
+			enddate = request.GET.get('enddate')
+			
+			if startdate is not None or enddate is not None: # at least one date range param provided
+				if startdate is None:
+					startdate = datetime.min
+				if enddate is None:
+					enddate = datetime.max
+
+				reports = reports.filter(date__range=[startdate, enddate])
 		
 		data = ReportSerializer(reports, many=True).data
 		return Response(data)
