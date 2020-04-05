@@ -26,6 +26,10 @@ class ReportsApiView(APIView):
 		regionParam = request.GET.get('ca')
 		if regionParam is not None:
 			reports = reports.filter(ca=regionParam)
+
+		dateParam = request.GET.get('date')
+		if dateParam is not None:
+			reports = reports.filter(date=dateParam)
 		
 		data = ReportSerializer(reports, many=True).data
 		return Response(data)
