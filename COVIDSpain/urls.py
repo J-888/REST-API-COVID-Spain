@@ -20,8 +20,6 @@ from django.conf.urls import url, include
 from reports.admin import admin_site
 
 urlpatterns = [
-	# path('admin/', admin.site.urls),
 	path('admin/', admin_site.urls),
-	# path('admin/', include(admin_site.urls)),
 	url(r'^', include('reports.urls')),
 ]

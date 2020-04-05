@@ -7,8 +7,10 @@ from rest_framework.parsers import JSONParser
 from reports.models import Report
 from reports.serializers import ReportSerializer
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from datetime import datetime
+from django.views.generic.base import RedirectView
 
 class JSONResponse(HttpResponse):
 	# An HttpResponse that renders its content into JSON.
@@ -17,10 +19,15 @@ class JSONResponse(HttpResponse):
 		kwargs['content_type'] = 'application/json'
 		super(JSONResponse, self).__init__(content, **kwargs)
 
+# class ReportsApiView(generics.ListCreateAPIView):
 class ReportsApiView(APIView):
 	"""
-	Return a list of all the existing reports.
+	Return a list of all existing reports.
 	"""
+	
+	queryset = Report.objects.all()
+	serializer_class = ReportSerializer
+
 	def get(self, request):
 		reports = Report.objects.all()
 
@@ -49,6 +56,7 @@ class ReportsApiView(APIView):
 		data = ReportSerializer(reports, many=True).data
 		return Response(data)
 
+
 """
 # API Services
 @csrf_exempt # TODO only POST requires csrf token
@@ -74,7 +82,7 @@ def report_list(request):
 		return JSONResponse(serializer.errors, status=400)
 """
 
-@csrf_exempt # TODO only POST, PUT and DELETE requires csrf token
+# @csrf_exempt # TODO only POST, PUT and DELETE requires csrf token
 def report_detail(request, pk):
 	# Retrieve, update or delete a report.
 
@@ -98,3 +106,7 @@ def report_detail(request, pk):
 	elif request.method == 'DELETE':
 		report.delete()
 		return HttpResponse(status=204)
+
+
+class GithubRedirectView(RedirectView):
+  url = "https://github.com/J-888/REST-API-COVID-Spain"
