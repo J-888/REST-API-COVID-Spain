@@ -6,8 +6,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from reports.models import Report
 from reports.serializers import ReportSerializer
-
-from django.views.generic.list import ListView
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 class JSONResponse(HttpResponse):
 	# An HttpResponse that renders its content into JSON.
@@ -16,9 +16,21 @@ class JSONResponse(HttpResponse):
 		kwargs['content_type'] = 'application/json'
 		super(JSONResponse, self).__init__(content, **kwargs)
 
-"""class ReportsListView(ListView):
-	model = Report"""
+class ReportsApiView(APIView):
+	"""
+	Return a list of all the existing reports.
+	"""
+	def get(self, request):
+		reports = Report.objects.all()
 
+		regionParam = request.GET.get('ca')
+		if regionParam is not None:
+			reports = reports.filter(ca=regionParam)
+		
+		data = ReportSerializer(reports, many=True).data
+		return Response(data)
+
+"""
 # API Services
 @csrf_exempt # TODO only POST requires csrf token
 def report_list(request):
@@ -27,7 +39,7 @@ def report_list(request):
 	if request.method == 'GET':
 		reports = Report.objects.all()
 
-		regionParam = request.GET.get('ca') # TODO NO PARAM SUPPORT
+		regionParam = request.GET.get('ca')
 		if regionParam is not None:
 			reports = reports.filter(ca=regionParam)
 
@@ -41,6 +53,7 @@ def report_list(request):
 			serializer.save()
 			return JSONResponse(serializer.data, status=201)
 		return JSONResponse(serializer.errors, status=400)
+"""
 
 @csrf_exempt # TODO only POST, PUT and DELETE requires csrf token
 def report_detail(request, pk):
