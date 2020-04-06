@@ -46,6 +46,6 @@ http://jmtg888.pythonanywhere.com/reports/?querty1&query2&query3
 | Query     | Description                 | Example              |
 |-----------|-----------------------------|----------------------|
 | ca        | Comunidad Autonoma (region) | ca=madrid            |
-| date      | Exact date                  | date=2020-31-03      |
-| startdate | After a date                | startdate=2020-31-03 |
-| enddate   | Before a date               | enddate=2020-31-03   |
+| date      | Exact date                  | date=2020-03-31      |
+| startdate | After a date                | startdate=2020-03-31 |
+| enddate   | Before a date               | enddate=2020-03-31   |
